@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "app-1769938716484",
+    "studentId": "s-1769938679707",
+    "driveId": "1",
+    "appliedAt": "2026-02-01T09:38:36.484Z",
+    "status": "Applied"
+  },
+  {
+    "id": "app-1769938719885",
+    "studentId": "s-1769938679707",
+    "driveId": "2",
+    "appliedAt": "2026-02-01T09:38:39.885Z",
+    "status": "Applied"
+  },
+  {
+    "id": "app-1769938722310",
+    "studentId": "s-1769938679707",
+    "driveId": "3",
+    "appliedAt": "2026-02-01T09:38:42.310Z",
+    "status": "Applied"
+  }
+]

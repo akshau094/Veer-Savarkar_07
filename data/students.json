@@ -78,5 +78,26 @@
     "branch": "Not Specified",
     "backlogs": 0,
     "skills": []
+  },
+  {
+    "id": "s-1769938679707",
+    "name": "Inta",
+    "username": "inta",
+    "cgpa": "8.9",
+    "branch": "CSE",
+    "backlogs": "0",
+    "skills": "python",
+    "year": "3",
+    "resumeName": "resume.pdf"
+  },
+  {
+    "id": "s-1769938811922",
+    "name": "Vedant",
+    "username": "vedant",
+    "password": "Aexsaitwal094",
+    "cgpa": 0,
+    "branch": "Not Specified",
+    "backlogs": 0,
+    "skills": []
   }
 ]

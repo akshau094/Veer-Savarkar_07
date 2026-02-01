@@ -94,10 +94,11 @@
     "id": "s-1769938811922",
     "name": "Vedant",
     "username": "vedant",
-    "password": "Aexsaitwal094",
-    "cgpa": 0,
-    "branch": "Not Specified",
-    "backlogs": 0,
-    "skills": []
+    "cgpa": "8.9",
+    "branch": "CSE",
+    "backlogs": "0",
+    "skills": "python",
+    "year": "1",
+    "resumeName": "094 resume (2).pdf"
   }
 ]

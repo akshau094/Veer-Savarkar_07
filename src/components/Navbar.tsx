@@ -6,17 +6,19 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState<{name?: string, username?: string} | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const profile = localStorage.getItem('studentProfile');
-    setIsLoggedIn(!!profile);
+    if (profile) {
+      setUserProfile(JSON.parse(profile));
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('studentProfile');
-    setIsLoggedIn(false);
+    setUserProfile(null);
     router.push('/');
   };
 
@@ -36,14 +38,19 @@ export default function Navbar() {
             <Link href="/company" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
               Company Section
             </Link>
-            {isLoggedIn && (
-              <button
-                onClick={handleLogout}
-                className="text-red-600 hover:text-red-800 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
-            )}
+            {userProfile ? (
+              <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-gray-200">
+                <span className="text-sm font-medium text-gray-700">
+                  Hi, {userProfile.name || userProfile.username}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors border border-red-200"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

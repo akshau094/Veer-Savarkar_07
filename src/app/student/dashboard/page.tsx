@@ -76,20 +76,24 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const loadData = async () => {
+      console.log('Dashboard: Loading data...');
       // 1. Load Student Profile
       let currentProfile = null;
       try {
         const savedProfile = localStorage.getItem('studentProfile');
         if (savedProfile) {
           currentProfile = JSON.parse(savedProfile);
+          console.log('Dashboard: Profile loaded', currentProfile);
           setProfile(currentProfile);
           // Only fetch suggestions if we have a valid profile
           if (currentProfile && currentProfile.name) {
             fetchAISuggestions(currentProfile);
           }
+        } else {
+          console.warn('Dashboard: No profile found in localStorage');
         }
       } catch (e) {
-        console.error('Failed to parse profile:', e);
+        console.error('Dashboard: Failed to parse profile:', e);
       }
 
       // 2. Load Drives
@@ -97,10 +101,13 @@ export default function StudentDashboard() {
         const driveRes = await fetch('/api/drives');
         if (driveRes.ok) {
           const allDrives = await driveRes.json();
+          console.log('Dashboard: Drives loaded', allDrives);
           setDrives(Array.isArray(allDrives) ? allDrives : []);
+        } else {
+          console.error('Dashboard: Failed to fetch drives', driveRes.status);
         }
       } catch (e) {
-        console.error('Failed to load drives:', e);
+        console.error('Dashboard: Error loading drives:', e);
         setDrives([]);
       }
 
@@ -110,10 +117,13 @@ export default function StudentDashboard() {
           const appRes = await fetch(`/api/applications?studentId=${currentProfile.id}`);
           if (appRes.ok) {
             const apps = await appRes.json();
+            console.log('Dashboard: Applications loaded', apps);
             setApplications(Array.isArray(apps) ? apps : []);
+          } else {
+            console.error('Dashboard: Failed to fetch applications', appRes.status);
           }
         } catch (e) {
-          console.error('Failed to load applications:', e);
+          console.error('Dashboard: Error loading applications:', e);
           setApplications([]);
         }
       }
@@ -221,7 +231,7 @@ export default function StudentDashboard() {
             <div className="flex space-x-2">
               {aiSuggestions && (
                 <button 
-                  onClick={toggleSpeech}
+                  onClick={() => toggleSpeech()}
                   className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg border transition-all active:scale-95 ${
                     isSpeaking 
                       ? 'bg-red-50 text-red-600 border-red-200' 
@@ -377,7 +387,7 @@ export default function StudentDashboard() {
                               {app.status} at {drive?.name}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {new Date(app.updatedAt || app.appliedAt).toLocaleDateString()}
+                              {new Date(app.updatedAt || app.appliedAt || 0).toLocaleDateString()}
                             </p>
                           </div>
                         </div>

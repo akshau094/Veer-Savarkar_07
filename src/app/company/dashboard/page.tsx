@@ -10,7 +10,11 @@ export default function CompanyDashboard() {
   const [selectedDrive, setSelectedDrive] = useState<CompanyDrive | null>(null);
 
   useEffect(() => {
-    setDrives(getDrives());
+    const loadDrives = async () => {
+      const data = await getDrives();
+      setDrives(data);
+    };
+    loadDrives();
   }, []);
 
   const checkEligibility = (student: Student, drive: CompanyDrive) => {

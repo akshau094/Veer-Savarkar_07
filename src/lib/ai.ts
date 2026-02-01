@@ -1,13 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export async function getPlacementSuggestions(studentProfile: any, drives: any[]) {
-  if (!process.env.GEMINI_API_KEY) {
-    return "AI suggestions are currently unavailable. Please set up the Gemini API key.";
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  
+  if (!apiKey) {
+    return "AI suggestions are currently unavailable. Please set up the OpenRouter API key in .env.local.";
   }
-
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
     You are a placement counselor. Analyze this student profile and suggest which of the listed placement drives they should prioritize and why.
@@ -30,11 +26,35 @@ export async function getPlacementSuggestions(studentProfile: any, drives: any[]
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "HTTP-Referer": "http://localhost:3000", // Optional, for OpenRouter analytics
+        "X-Title": "Campus Placement System", // Optional
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "model": "google/gemini-2.0-flash-exp:free",
+        "messages": [
+          {
+            "role": "user",
+            "content": prompt
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    
+    if (data.error) {
+      console.error("OpenRouter API Error:", data.error);
+      return "The AI service returned an error. Please check your API key.";
+    }
+
+    return data.choices?.[0]?.message?.content || "No suggestions available at the moment.";
   } catch (error) {
-    console.error("Gemini AI Error:", error);
-    return "Failed to generate AI suggestions at this moment.";
+    console.error("OpenRouter AI Error:", error);
+    return "Failed to connect to AI service. Please check your internet connection.";
   }
 }

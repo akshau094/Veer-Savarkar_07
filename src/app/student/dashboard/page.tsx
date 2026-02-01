@@ -181,7 +181,7 @@ export default function StudentDashboard() {
               </div>
             ) : (
               <p className="text-gray-500 italic text-center py-4">
-                Set your GEMINI_API_KEY in your .env file to see AI-powered placement suggestions!
+                Set your OPENROUTER_API_KEY in your .env.local file to see AI-powered placement suggestions!
               </p>
             )}
           </div>

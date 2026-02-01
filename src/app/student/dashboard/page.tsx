@@ -78,31 +78,43 @@ export default function StudentDashboard() {
     const loadData = async () => {
       // 1. Load Student Profile
       let currentProfile = null;
-      const savedProfile = localStorage.getItem('studentProfile');
-      if (savedProfile) {
-        currentProfile = JSON.parse(savedProfile);
-        setProfile(currentProfile);
-        fetchAISuggestions(currentProfile);
+      try {
+        const savedProfile = localStorage.getItem('studentProfile');
+        if (savedProfile) {
+          currentProfile = JSON.parse(savedProfile);
+          setProfile(currentProfile);
+          // Only fetch suggestions if we have a valid profile
+          if (currentProfile && currentProfile.name) {
+            fetchAISuggestions(currentProfile);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse profile:', e);
       }
 
       // 2. Load Drives
       try {
         const driveRes = await fetch('/api/drives');
-        const allDrives = await driveRes.json();
-        setDrives(Array.isArray(allDrives) ? allDrives : []);
+        if (driveRes.ok) {
+          const allDrives = await driveRes.json();
+          setDrives(Array.isArray(allDrives) ? allDrives : []);
+        }
       } catch (e) {
         console.error('Failed to load drives:', e);
         setDrives([]);
       }
 
       // 3. Load Applications from local system
-      if (currentProfile) {
+      if (currentProfile && currentProfile.id) {
         try {
           const appRes = await fetch(`/api/applications?studentId=${currentProfile.id}`);
-          const apps = await appRes.json();
-          setApplications(Array.isArray(apps) ? apps : []);
+          if (appRes.ok) {
+            const apps = await appRes.json();
+            setApplications(Array.isArray(apps) ? apps : []);
+          }
         } catch (e) {
           console.error('Failed to load applications:', e);
+          setApplications([]);
         }
       }
     };
@@ -122,7 +134,7 @@ export default function StudentDashboard() {
     let isEligible = true;
 
     // CGPA Check
-    const studentCgpa = parseFloat(profile.cgpa);
+    const studentCgpa = profile.cgpa ? parseFloat(profile.cgpa) : 0;
     if (studentCgpa >= drive.criteria.minCgpa) {
       reasons.push(`Eligible because CGPA ${studentCgpa} >= ${drive.criteria.minCgpa}`);
     } else {
@@ -131,15 +143,16 @@ export default function StudentDashboard() {
     }
 
     // Branch Check
-    if (drive.criteria.allowedBranches.includes(profile.branch)) {
-      reasons.push(`Eligible because branch ${profile.branch} is allowed`);
+    const studentBranch = profile.branch || 'Not Specified';
+    if (drive.criteria.allowedBranches.includes(studentBranch)) {
+      reasons.push(`Eligible because branch ${studentBranch} is allowed`);
     } else {
-      reasons.push(`Not eligible because branch ${profile.branch} is not in allowed list (${drive.criteria.allowedBranches.join(', ')})`);
+      reasons.push(`Not eligible because branch ${studentBranch} is not in allowed list (${drive.criteria.allowedBranches.join(', ')})`);
       isEligible = false;
     }
 
     // Backlog Check
-    const studentBacklogs = parseInt(profile.backlogs);
+    const studentBacklogs = profile.backlogs ? parseInt(profile.backlogs) : 0;
     if (studentBacklogs <= drive.criteria.maxBacklogs) {
       reasons.push(`Eligible because backlogs ${studentBacklogs} <= ${drive.criteria.maxBacklogs} allowed`);
     } else {
@@ -344,9 +357,13 @@ export default function StudentDashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="space-y-4">
                 {applications.filter(a => a.status !== 'Applied').length > 0 ? (
-                  applications
+                  [...applications]
                     .filter(a => a.status !== 'Applied')
-                    .sort((a, b) => new Date(b.updatedAt || b.appliedAt).getTime() - new Date(a.updatedAt || a.appliedAt).getTime())
+                    .sort((a, b) => {
+                      const dateA = new Date(a.updatedAt || a.appliedAt || 0).getTime();
+                      const dateB = new Date(b.updatedAt || b.appliedAt || 0).getTime();
+                      return dateB - dateA;
+                    })
                     .map((app, idx) => {
                       const drive = drives.find(d => d.id === app.driveId);
                       return (

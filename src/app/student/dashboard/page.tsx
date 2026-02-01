@@ -17,7 +17,9 @@ export default function StudentDashboard() {
   const [loadingAI, setLoadingAI] = useState(false);
 
   const fetchAISuggestions = async (currentProfile: any) => {
+    if (loadingAI) return;
     setLoadingAI(true);
+    setAiSuggestions('');
     try {
       const res = await fetch('/api/ai-suggestions', {
         method: 'POST',
@@ -157,7 +159,14 @@ export default function StudentDashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">AI Career Assistant</h2>
+            <h2 className="text-xl font-bold text-gray-900 flex-grow">AI Career Assistant</h2>
+            <button 
+              onClick={() => fetchAISuggestions(profile)}
+              disabled={loadingAI}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-white px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm transition-all active:scale-95 disabled:opacity-50"
+            >
+              {loadingAI ? 'Analyzing...' : 'Regenerate Suggestions'}
+            </button>
           </div>
           
           <div className="bg-white rounded-xl p-5 border border-blue-50 min-h-[100px] relative">
@@ -178,11 +187,12 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Upcoming Placement Drives</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {drives.map(drive => {
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <h2 className="text-2xl font-bold text-gray-900">Upcoming Placement Drives</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {drives.map(drive => {
             const { isEligible, reasons } = checkEligibility(drive);
             const application = applications.find(app => app.driveId === drive.id);
             const isApplied = !!application;
@@ -252,6 +262,44 @@ export default function StudentDashboard() {
               </div>
             );
           })}
+          </div>
+          </div>
+
+          {/* Activity/Notification Sidebar */}
+          <div className="lg:col-span-1">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="space-y-4">
+                {applications.filter(a => a.status !== 'Applied').length > 0 ? (
+                  applications
+                    .filter(a => a.status !== 'Applied')
+                    .sort((a, b) => new Date(b.updatedAt || b.appliedAt).getTime() - new Date(a.updatedAt || a.appliedAt).getTime())
+                    .map((app, idx) => {
+                      const drive = drives.find(d => d.id === app.driveId);
+                      return (
+                        <div key={idx} className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
+                          <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${
+                            app.status === 'Selected' ? 'bg-green-500' : 
+                            app.status === 'Rejected' ? 'bg-red-500' : 'bg-blue-500'
+                          }`} />
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {app.status} at {drive?.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(app.updatedAt || app.appliedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-500 italic">No recent status updates.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </main>

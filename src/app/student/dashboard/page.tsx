@@ -20,19 +20,26 @@ export default function StudentDashboard() {
   const toggleSpeech = (textToSpeak?: string) => {
     if (typeof window === 'undefined') return;
 
-    if (isSpeaking) {
-      window.speechSynthesis.cancel();
+    // Always stop any current speech first
+    window.speechSynthesis.cancel();
+
+    // If we're already speaking and just toggled (without new text), then stop
+    if (isSpeaking && !textToSpeak) {
       setIsSpeaking(false);
-    } else {
-      const targetText = textToSpeak || aiSuggestions;
-      if (!targetText) return;
-      
-      const utterance = new SpeechSynthesisUtterance(targetText);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      setIsSpeaking(true);
-      window.speechSynthesis.speak(utterance);
+      return;
     }
+
+    const targetText = textToSpeak || aiSuggestions;
+    if (!targetText) {
+      setIsSpeaking(false);
+      return;
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(targetText);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
   };
 
   const fetchAISuggestions = async (currentProfile: any) => {
@@ -82,9 +89,10 @@ export default function StudentDashboard() {
       try {
         const driveRes = await fetch('/api/drives');
         const allDrives = await driveRes.json();
-        setDrives(allDrives);
+        setDrives(Array.isArray(allDrives) ? allDrives : []);
       } catch (e) {
         console.error('Failed to load drives:', e);
+        setDrives([]);
       }
 
       // 3. Load Applications from local system
@@ -257,7 +265,7 @@ export default function StudentDashboard() {
             <h2 className="text-2xl font-bold text-gray-900">Upcoming Placement Drives</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {drives.map(drive => {
+            {Array.isArray(drives) && drives.map(drive => {
             const { isEligible, reasons } = checkEligibility(drive);
             const application = applications.find(app => app.driveId === drive.id);
             const isApplied = !!application;

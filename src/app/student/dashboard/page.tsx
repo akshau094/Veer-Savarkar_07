@@ -92,7 +92,8 @@ export default function StudentDashboard() {
       });
 
       if (res.ok) {
-        setApplications(prev => [...prev, driveId]);
+        const newApp = await res.json();
+        setApplications(prev => [...prev, newApp]);
         alert('Application submitted and saved locally!');
       } else {
         const error = await res.json();

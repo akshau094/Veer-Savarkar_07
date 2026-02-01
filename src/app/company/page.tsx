@@ -23,12 +23,12 @@ export default function CompanyPortal() {
       // 2. Load Students from local system
       const studentRes = await fetch('/api/students');
       const studentData = await studentRes.json();
-      setStudents(studentData);
+      setStudents(Array.isArray(studentData) ? studentData : []);
 
       // 3. Load Applications
       const appRes = await fetch('/api/applications');
       const appData = await appRes.json();
-      setApplications(appData);
+      setApplications(Array.isArray(appData) ? appData : []);
     };
     loadData();
   }, []);
@@ -38,23 +38,23 @@ export default function CompanyPortal() {
     let isEligible = true;
 
     if (student.cgpa >= drive.criteria.minCgpa) {
-      reasons.push(`CGPA ${student.cgpa} >= ${drive.criteria.minCgpa}`);
+      reasons.push(`Eligible: CGPA ${student.cgpa} >= ${drive.criteria.minCgpa}`);
     } else {
-      reasons.push(`CGPA ${student.cgpa} < ${drive.criteria.minCgpa}`);
+      reasons.push(`Not Eligible: CGPA ${student.cgpa} < ${drive.criteria.minCgpa}`);
       isEligible = false;
     }
 
     if (drive.criteria.allowedBranches.includes(student.branch)) {
-      reasons.push(`Branch ${student.branch} is allowed`);
+      reasons.push(`Eligible: Branch ${student.branch} is allowed`);
     } else {
-      reasons.push(`Branch ${student.branch} not allowed`);
+      reasons.push(`Not Eligible: Branch ${student.branch} not allowed`);
       isEligible = false;
     }
 
     if (student.backlogs <= drive.criteria.maxBacklogs) {
-      reasons.push(`Backlogs ${student.backlogs} <= ${drive.criteria.maxBacklogs}`);
+      reasons.push(`Eligible: Backlogs ${student.backlogs} <= ${drive.criteria.maxBacklogs}`);
     } else {
-      reasons.push(`Backlogs ${student.backlogs} > ${drive.criteria.maxBacklogs}`);
+      reasons.push(`Not Eligible: Backlogs ${student.backlogs} > ${drive.criteria.maxBacklogs}`);
       isEligible = false;
     }
 

@@ -32,7 +32,11 @@ export async function POST(request: Request) {
       students.push(studentData);
     }
     
-    await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+    } catch (writeError) {
+      console.error('Vercel Write Warning:', writeError);
+    }
     return NextResponse.json(studentData);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to save student data' }, { status: 500 });

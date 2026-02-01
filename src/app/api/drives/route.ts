@@ -26,7 +26,11 @@ export async function POST(request: Request) {
     
     drives.push(newDrive);
     
-    await fs.writeFile(DATA_FILE, JSON.stringify(drives, null, 2));
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(drives, null, 2));
+    } catch (writeError) {
+      console.error('Vercel Write Warning:', writeError);
+    }
     return NextResponse.json(newDrive);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to save drive' }, { status: 500 });

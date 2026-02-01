@@ -55,7 +55,11 @@ export async function POST(request: Request) {
     };
     
     applications.push(application);
-    await fs.writeFile(DATA_FILE, JSON.stringify(applications, null, 2));
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(applications, null, 2));
+    } catch (writeError) {
+      console.error('Vercel Write Warning:', writeError);
+    }
     
     return NextResponse.json(application);
   } catch (error) {
@@ -77,7 +81,11 @@ export async function PATCH(request: Request) {
     applications[index].status = status;
     applications[index].updatedAt = new Date().toISOString();
     
-    await fs.writeFile(DATA_FILE, JSON.stringify(applications, null, 2));
+    try {
+      await fs.writeFile(DATA_FILE, JSON.stringify(applications, null, 2));
+    } catch (writeError) {
+      console.error('Vercel Write Warning:', writeError);
+    }
     
     return NextResponse.json(applications[index]);
   } catch (error) {

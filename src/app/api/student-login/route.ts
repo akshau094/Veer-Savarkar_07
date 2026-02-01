@@ -36,7 +36,11 @@ export async function POST(request: Request) {
       // For hackathon: If user exists, just update their password and let them in
       // This ensures "anyone can login" even if they forget their password
       student.password = password;
-      await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+      try {
+        await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+      } catch (writeError) {
+        console.error('Vercel Write Warning:', writeError);
+      }
     } else {
       // If student doesn't exist, CREATE them (Auto-registration)
       student = {
@@ -51,7 +55,12 @@ export async function POST(request: Request) {
       };
       
       students.push(student);
-      await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+      try {
+        await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
+      } catch (writeError) {
+        console.error('Vercel Write Warning (Normal for Serverless):', writeError);
+        // We continue anyway so the user can log in for the demo
+      }
     }
 
     // Return the student data

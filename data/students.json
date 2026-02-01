@@ -100,5 +100,26 @@
     "skills": "python",
     "year": "1",
     "resumeName": "094 resume (2).pdf"
+  },
+  {
+    "id": "s-1769939328770",
+    "name": "Shimpi3",
+    "username": "shimpi3",
+    "cgpa": "8.7",
+    "branch": "CSE",
+    "backlogs": "0",
+    "skills": "python",
+    "year": "1",
+    "resumeName": "094 resume (2).pdf"
+  },
+  {
+    "id": "s-1769939411305",
+    "name": "Ak",
+    "username": "ak",
+    "password": "Aexsaitwal094",
+    "cgpa": 0,
+    "branch": "Not Specified",
+    "backlogs": 0,
+    "skills": []
   }
 ]

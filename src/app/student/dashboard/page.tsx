@@ -13,6 +13,25 @@ export default function StudentDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [applications, setApplications] = useState<any[]>([]);
   const [drives, setDrives] = useState<CompanyDrive[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<string>('');
+  const [loadingAI, setLoadingAI] = useState(false);
+
+  const fetchAISuggestions = async (currentProfile: any) => {
+    setLoadingAI(true);
+    try {
+      const res = await fetch('/api/ai-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentProfile: currentProfile }),
+      });
+      const data = await res.json();
+      setAiSuggestions(data.suggestions || 'No suggestions available.');
+    } catch (e) {
+      console.error('AI Suggestion Error:', e);
+    } finally {
+      setLoadingAI(false);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,6 +41,7 @@ export default function StudentDashboard() {
       if (savedProfile) {
         currentProfile = JSON.parse(savedProfile);
         setProfile(currentProfile);
+        fetchAISuggestions(currentProfile);
       }
 
       // 2. Load Drives
@@ -127,6 +147,35 @@ export default function StudentDashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
           <p className="text-gray-600">Welcome back, {profile.name} ({profile.branch})</p>
+        </div>
+
+        {/* AI Suggestions Section */}
+        <div className="mb-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm">
+          <div className="flex items-center mb-4">
+            <div className="bg-blue-600 p-2 rounded-lg mr-3">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">AI Career Assistant</h2>
+          </div>
+          
+          <div className="bg-white rounded-xl p-5 border border-blue-50 min-h-[100px] relative">
+            {loadingAI ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-500 font-medium">Analyzing your profile...</span>
+              </div>
+            ) : aiSuggestions ? (
+              <div className="prose prose-blue max-w-none text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+                {aiSuggestions}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic text-center py-4">
+                Set your GEMINI_API_KEY in your .env file to see AI-powered placement suggestions!
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">

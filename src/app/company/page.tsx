@@ -1,12 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
-import { mockDrives, mockStudents, CompanyDrive, Student } from '@/lib/mockData';
+import { getDrives, mockStudents, CompanyDrive, Student } from '@/lib/mockData';
 
 export default function CompanyPortal() {
-  const [selectedDrive, setSelectedDrive] = useState<CompanyDrive | null>(mockDrives[0]);
+  const [drives, setDrives] = useState<CompanyDrive[]>([]);
+  const [selectedDrive, setSelectedDrive] = useState<CompanyDrive | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      // 1. Load Drives
+      const allDrives = await getDrives();
+      setDrives(allDrives);
+      if (allDrives.length > 0) {
+        setSelectedDrive(allDrives[0]);
+      }
+
+      // 2. Load Students from local system
+      const studentRes = await fetch('/api/students');
+      const studentData = await studentRes.json();
+      setStudents(studentData);
+
+      // 3. Load Applications
+      const appRes = await fetch('/api/applications');
+      const appData = await appRes.json();
+      setApplications(appData);
+    };
+    loadData();
+  }, []);
   
   const checkEligibility = (student: Student, drive: CompanyDrive) => {
     const reasons: string[] = [];
@@ -62,7 +87,7 @@ export default function CompanyPortal() {
             <h2 className="text-lg font-semibold text-gray-800">Existing Drives</h2>
             <div className="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
               <nav className="divide-y divide-gray-200">
-                {mockDrives.map(drive => (
+                {drives.map(drive => (
                   <button
                     key={drive.id}
                     onClick={() => setSelectedDrive(drive)}
@@ -111,17 +136,21 @@ export default function CompanyPortal() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {mockStudents.map(student => {
+                      {students.map(student => {
                         const { isEligible, reasons } = checkEligibility(student, selectedDrive);
+                        const application = applications.find(
+                          app => app.studentId === student.id && app.driveId === selectedDrive.id
+                        );
+                        
                         return (
                           <tr key={student.id}>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                              <div className="text-xs text-gray-500">CGPA: {student.cgpa} | Backlogs: {student.backlogs}</div>
+                              {application && (
+                                <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded">Applied</span>
+                              )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {student.branch}
-                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.cgpa}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                 isEligible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'

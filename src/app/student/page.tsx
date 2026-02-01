@@ -7,13 +7,38 @@ import Navbar from '@/components/Navbar';
 export default function StudentLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would validate credentials here
-    // For now, let's redirect to the profile setup
-    router.push('/student/profile');
+    setError('');
+
+    try {
+      const res = await fetch('/api/student-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Store student info in localStorage for session
+        localStorage.setItem('studentProfile', JSON.stringify(data.student));
+        
+        // If it's a new user (CGPA is 0), send to profile setup, else dashboard
+        if (data.student.cgpa === 0) {
+          router.push('/student/profile');
+        } else {
+          router.push('/student/dashboard');
+        }
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -22,12 +47,20 @@ export default function StudentLogin() {
       <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Student Login
+            Student Portal
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Enter any username and password to log in or register automatically.
+          </p>
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
+            {error && (
+              <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 text-red-700 text-sm">
+                {error}
+              </div>
+            )}
             <form className="space-y-6" onSubmit={handleLogin}>
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">

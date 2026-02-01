@@ -93,3 +93,29 @@ export const mockStudents: Student[] = [
     skills: ['AutoCAD', 'Thermodynamics'],
   },
 ];
+
+// Helper functions for API persistence
+export const getDrives = async (): Promise<CompanyDrive[]> => {
+  try {
+    const res = await fetch('/api/drives');
+    if (!res.ok) throw new Error('Failed to fetch');
+    return await res.json();
+  } catch (e) {
+    console.error('Error fetching drives:', e);
+    return mockDrives;
+  }
+};
+
+export const saveDrive = async (drive: CompanyDrive) => {
+  try {
+    const res = await fetch('/api/drives', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(drive),
+    });
+    if (!res.ok) throw new Error('Failed to save');
+    return await res.json();
+  } catch (e) {
+    console.error('Error saving drive:', e);
+  }
+};

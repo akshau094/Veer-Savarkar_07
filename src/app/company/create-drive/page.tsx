@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import { saveDrive, CompanyDrive } from '@/lib/mockData';
 
 export default function CreateDrive() {
   const router = useRouter();
@@ -27,19 +28,25 @@ export default function CreateDrive() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, save to DB
-    const newDrive = {
-      ...formData,
+    
+    const newDrive: CompanyDrive = {
       id: Date.now().toString(),
-      requiredSkills: formData.requiredSkills.split(',').map(s => s.trim()),
+      name: formData.name,
+      role: formData.role,
+      package: formData.package,
+      criteria: {
+        minCgpa: parseFloat(formData.minCgpa),
+        maxBacklogs: parseInt(formData.maxBacklogs),
+        allowedBranches: formData.allowedBranches,
+        requiredSkills: formData.requiredSkills.split(',').map(s => s.trim()),
+      }
     };
     
-    // For demo, we'll just log it and redirect
-    console.log('New Drive Created:', newDrive);
+    await saveDrive(newDrive);
     alert('Placement Drive Created Successfully!');
-    router.push('/company/dashboard');
+    router.push('/company');
   };
 
   return (

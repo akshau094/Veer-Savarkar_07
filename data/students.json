@@ -1,0 +1,81 @@
+[
+  {
+    "cgpa": "-0.01",
+    "branch": "CSE",
+    "skills": "ask",
+    "year": "1",
+    "backlogs": "0",
+    "id": "s1",
+    "name": "Akash Kumar"
+  },
+  {
+    "id": "s2",
+    "name": "Priya Sharma",
+    "username": "priya",
+    "password": "password123",
+    "cgpa": 9.1,
+    "branch": "IT",
+    "backlogs": 0,
+    "skills": [
+      "Java",
+      "SQL",
+      "Algorithms"
+    ]
+  },
+  {
+    "id": "s3",
+    "name": "Rahul Singh",
+    "username": "rahul",
+    "password": "password123",
+    "cgpa": 7.4,
+    "branch": "ECE",
+    "backlogs": 1,
+    "skills": [
+      "C++",
+      "Embedded Systems"
+    ]
+  },
+  {
+    "id": "s4",
+    "name": "Suresh Raina",
+    "username": "suresh",
+    "password": "password123",
+    "cgpa": 6.5,
+    "branch": "MECH",
+    "backlogs": 3,
+    "skills": [
+      "AutoCAD",
+      "Thermodynamics"
+    ]
+  },
+  {
+    "id": "s-1769936663085",
+    "name": "Shimpi2",
+    "username": "shimpi2",
+    "password": "ak",
+    "cgpa": 0,
+    "branch": "Not Specified",
+    "backlogs": 0,
+    "skills": []
+  },
+  {
+    "id": "s-1769936807560",
+    "name": "Akshaysaitwal9@gmail.com",
+    "username": "akshaysaitwal9@gmail.com",
+    "password": "akshaysaitwal@ms",
+    "cgpa": 0,
+    "branch": "Not Specified",
+    "backlogs": 0,
+    "skills": []
+  },
+  {
+    "id": "s-1769936931929",
+    "name": "22001805",
+    "username": "22001805",
+    "password": "Aexsaitwal094",
+    "cgpa": 0,
+    "branch": "Not Specified",
+    "backlogs": 0,
+    "skills": []
+  }
+]

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { mockDrives, CompanyDrive } from '@/lib/mockData';
+import { getDrives, CompanyDrive } from '@/lib/mockData';
 
 interface EligibilityResult {
   isEligible: boolean;
@@ -12,12 +12,43 @@ interface EligibilityResult {
 export default function StudentDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [applications, setApplications] = useState<string[]>([]);
+  const [drives, setDrives] = useState<CompanyDrive[]>([]);
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem('studentProfile');
-    if (savedProfile) {
-      setProfile(JSON.parse(savedProfile));
-    }
+    const loadData = async () => {
+      // 1. Load Student Profile
+      let currentProfile = null;
+      const savedProfile = localStorage.getItem('studentProfile');
+      if (savedProfile) {
+        currentProfile = JSON.parse(savedProfile);
+        setProfile(currentProfile);
+      } else {
+        const res = await fetch('/api/students');
+        const students = await res.json();
+        currentProfile = students.find((s: any) => s.id === 's1');
+        if (currentProfile) {
+          setProfile(currentProfile);
+          localStorage.setItem('studentProfile', JSON.stringify(currentProfile));
+        }
+      }
+
+      // 2. Load Drives
+      const allDrives = await getDrives();
+      setDrives(allDrives);
+
+      // 3. Load Applications from local system
+      if (currentProfile) {
+        try {
+          const appRes = await fetch(`/api/applications?studentId=${currentProfile.id}`);
+          const apps = await appRes.json();
+          setApplications(apps.map((a: any) => a.driveId));
+        } catch (e) {
+          console.error('Failed to load applications:', e);
+        }
+      }
+    };
+
+    loadData();
   }, []);
 
   const checkEligibility = (drive: CompanyDrive): EligibilityResult => {
@@ -55,9 +86,29 @@ export default function StudentDashboard() {
     return { isEligible, reasons };
   };
 
-  const handleApply = (driveId: string) => {
-    setApplications(prev => [...prev, driveId]);
-    alert('Application submitted successfully!');
+  const handleApply = async (driveId: string) => {
+    if (!profile) return;
+
+    try {
+      const res = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: profile.id,
+          driveId: driveId
+        }),
+      });
+
+      if (res.ok) {
+        setApplications(prev => [...prev, driveId]);
+        alert('Application submitted and saved locally!');
+      } else {
+        const error = await res.json();
+        alert(error.error || 'Failed to apply');
+      }
+    } catch (e) {
+      alert('Error connecting to the local system');
+    }
   };
 
   if (!profile) {
@@ -77,13 +128,13 @@ export default function StudentDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {profile.branch} Student</p>
+          <p className="text-gray-600">Welcome back, {profile.name} ({profile.branch})</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
           <h2 className="text-xl font-semibold text-gray-800">Upcoming Placement Drives</h2>
           
-          {mockDrives.map(drive => {
+          {drives.map(drive => {
             const { isEligible, reasons } = checkEligibility(drive);
             const isApplied = applications.includes(drive.id);
 

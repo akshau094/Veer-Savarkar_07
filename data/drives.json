@@ -1,0 +1,76 @@
+[
+  {
+    "id": "1",
+    "name": "Google",
+    "role": "Software Engineer",
+    "package": "30 LPA",
+    "criteria": {
+      "minCgpa": 8.5,
+      "allowedBranches": [
+        "CSE",
+        "IT"
+      ],
+      "maxBacklogs": 0,
+      "requiredSkills": [
+        "Algorithms",
+        "Data Structures",
+        "Python"
+      ]
+    }
+  },
+  {
+    "id": "2",
+    "name": "TCS",
+    "role": "Systems Engineer",
+    "package": "7 LPA",
+    "criteria": {
+      "minCgpa": 7,
+      "allowedBranches": [
+        "CSE",
+        "IT",
+        "ECE",
+        "MECH"
+      ],
+      "maxBacklogs": 2,
+      "requiredSkills": [
+        "Java",
+        "SQL"
+      ]
+    }
+  },
+  {
+    "id": "3",
+    "name": "Infosys",
+    "role": "Power Programmer",
+    "package": "9 LPA",
+    "criteria": {
+      "minCgpa": 7.5,
+      "allowedBranches": [
+        "CSE",
+        "IT",
+        "ECE"
+      ],
+      "maxBacklogs": 1,
+      "requiredSkills": [
+        "C++",
+        "Problem Solving"
+      ]
+    }
+  },
+  {
+    "id": "1769936793866",
+    "name": "saitwal",
+    "role": "vdfg",
+    "package": "12lpa",
+    "criteria": {
+      "minCgpa": 7,
+      "maxBacklogs": 0,
+      "allowedBranches": [
+        "MECH"
+      ],
+      "requiredSkills": [
+        "python"
+      ]
+    }
+  }
+]

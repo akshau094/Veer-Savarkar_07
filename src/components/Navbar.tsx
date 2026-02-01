@@ -2,7 +2,24 @@
 
 import Link from 'next/link';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 export default function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const profile = localStorage.getItem('studentProfile');
+    setIsLoggedIn(!!profile);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('studentProfile');
+    setIsLoggedIn(false);
+    router.push('/');
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,6 +36,14 @@ export default function Navbar() {
             <Link href="/company" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
               Company Section
             </Link>
+            {isLoggedIn && (
+              <button
+                onClick={handleLogout}
+                className="text-red-600 hover:text-red-800 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>

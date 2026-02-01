@@ -19,11 +19,29 @@ export default function StudentProfile() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, save to DB
-    localStorage.setItem('studentProfile', JSON.stringify(formData));
-    router.push('/student/dashboard');
+    
+    const studentData = {
+      ...formData,
+      id: 's1', // For demo, we use a static ID or one from auth
+      name: 'Akash Kumar', // Mock name
+    };
+
+    try {
+      await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(studentData),
+      });
+      
+      // Still save to localStorage for quick dashboard access
+      localStorage.setItem('studentProfile', JSON.stringify(studentData));
+      router.push('/student/dashboard');
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      alert('Error saving profile to local system');
+    }
   };
 
   return (

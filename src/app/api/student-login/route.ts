@@ -7,12 +7,13 @@ const DATA_FILE = path.join(process.cwd(), 'data', 'students.json');
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { username, password } = body;
-    console.log('Login attempt for:', username);
+    let { username, password } = body;
     
-    if (!username || !password) {
-      return NextResponse.json({ success: false, message: 'Username and password are required' }, { status: 400 });
-    }
+    // Default values if empty
+    username = username || 'guest';
+    password = password || 'password';
+    
+    console.log('Login attempt for:', username);
 
     // Ensure data directory exists
     const dataDir = path.join(process.cwd(), 'data');

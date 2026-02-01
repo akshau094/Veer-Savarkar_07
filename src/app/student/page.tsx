@@ -22,6 +22,7 @@ export default function StudentLogin() {
       });
 
       const data = await res.json();
+      console.log('Login response:', data);
 
       if (data.success) {
         // Store student info in localStorage for session

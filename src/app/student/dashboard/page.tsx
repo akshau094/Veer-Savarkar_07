@@ -85,12 +85,25 @@ export default function StudentDashboard() {
           currentProfile = JSON.parse(savedProfile);
           console.log('Dashboard: Profile loaded', currentProfile);
           setProfile(currentProfile);
-          // Only fetch suggestions if we have a valid profile
-          if (currentProfile && currentProfile.name) {
-            fetchAISuggestions(currentProfile);
-          }
         } else {
-          console.warn('Dashboard: No profile found in localStorage');
+          // Fallback guest profile if no login exists
+          currentProfile = {
+            id: 'guest-' + Date.now(),
+            name: 'Guest Student',
+            username: 'guest',
+            cgpa: '8.5',
+            branch: 'Computer Science',
+            backlogs: '0',
+            skills: 'React, Node.js, JavaScript'
+          };
+          console.log('Dashboard: Using fallback guest profile', currentProfile);
+          setProfile(currentProfile);
+          localStorage.setItem('studentProfile', JSON.stringify(currentProfile));
+        }
+
+        // Fetch suggestions if we have a valid profile
+        if (currentProfile && currentProfile.name) {
+          fetchAISuggestions(currentProfile);
         }
       } catch (e) {
         console.error('Dashboard: Failed to parse profile:', e);

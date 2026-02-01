@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 
@@ -9,6 +9,26 @@ export default function StudentLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
+  // Automatically "log in" and redirect for hackathon demo
+  useEffect(() => {
+    const autoLogin = async () => {
+      const guestProfile = {
+        id: 'guest-' + Date.now(),
+        name: 'Guest Student',
+        username: 'guest',
+        cgpa: '8.5',
+        branch: 'Computer Science',
+        backlogs: '0',
+        skills: 'React, Node.js, JavaScript'
+      };
+      
+      localStorage.setItem('studentProfile', JSON.stringify(guestProfile));
+      router.push('/student/dashboard');
+    };
+    
+    autoLogin();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

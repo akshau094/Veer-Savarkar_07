@@ -21,8 +21,10 @@ export async function POST(request: Request) {
     try {
       const data = await fs.readFile(DATA_FILE, 'utf8');
       students = JSON.parse(data);
+      if (!Array.isArray(students)) {
+        students = [];
+      }
     } catch (e) {
-      // File doesn't exist or is empty, start with empty array
       students = [];
     }
     
@@ -31,13 +33,10 @@ export async function POST(request: Request) {
     );
 
     if (student) {
-      // If student exists, verify password
-      if (student.password !== password) {
-        return NextResponse.json(
-          { success: false, message: 'Invalid password' },
-          { status: 401 }
-        );
-      }
+      // For hackathon: If user exists, just update their password and let them in
+      // This ensures "anyone can login" even if they forget their password
+      student.password = password;
+      await fs.writeFile(DATA_FILE, JSON.stringify(students, null, 2));
     } else {
       // If student doesn't exist, CREATE them (Auto-registration)
       student = {

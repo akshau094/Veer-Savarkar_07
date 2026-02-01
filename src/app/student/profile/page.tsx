@@ -20,6 +20,38 @@ export default function StudentProfile() {
   };
 
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type === 'application/pdf') {
+        setSelectedFile(file);
+      } else {
+        alert('Please upload a PDF file');
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setSelectedFile(files[0]);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +64,7 @@ export default function StudentProfile() {
       const updatedProfile = {
         ...baseProfile,
         ...formData,
-        resumeName: 'resume.pdf'
+        resumeName: selectedFile ? selectedFile.name : (baseProfile.resumeName || 'No resume uploaded')
       };
 
       const res = await fetch('/api/students', {
@@ -130,17 +162,6 @@ export default function StudentProfile() {
                 </div>
 
                 <div className="sm:col-span-6">
-                  <label htmlFor="resume" className="block text-sm font-medium text-gray-700">Resume (PDF)</label>
-                  <input
-                    type="file"
-                    id="resume"
-                    name="resume"
-                    accept=".pdf"
-                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                </div>
-
-                <div className="sm:col-span-6">
                   <label htmlFor="skills" className="block text-sm font-medium text-gray-700">Skills (Comma separated)</label>
                   <textarea
                     id="skills"
@@ -156,19 +177,39 @@ export default function StudentProfile() {
 
                 <div className="sm:col-span-6">
                   <label className="block text-sm font-medium text-gray-700">Resume (PDF)</label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                  <div 
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors ${
+                      isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                    }`}
+                  >
                     <div className="space-y-1 text-center">
                       <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <div className="flex text-sm text-gray-600">
                         <label htmlFor="resume-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                          <span>Upload a file</span>
-                          <input id="resume-upload" name="resume-upload" type="file" className="sr-only" accept=".pdf" />
+                          <span>{selectedFile ? 'Change file' : 'Upload a file'}</span>
+                          <input 
+                            id="resume-upload" 
+                            name="resume-upload" 
+                            type="file" 
+                            className="sr-only" 
+                            accept=".pdf" 
+                            onChange={handleFileChange}
+                          />
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                      <p className="text-xs text-gray-500">
+                        {selectedFile ? (
+                          <span className="text-blue-600 font-semibold">{selectedFile.name}</span>
+                        ) : (
+                          'PDF up to 10MB'
+                        )}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -35,7 +35,7 @@ export async function getPlacementSuggestions(studentProfile: any, drives: any[]
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemini-2.0-flash-exp:free",
+        "model": "google/gemini-2.0-flash-001",
         "messages": [
           {
             "role": "user",
@@ -48,8 +48,8 @@ export async function getPlacementSuggestions(studentProfile: any, drives: any[]
     const data = await response.json();
     
     if (data.error) {
-      console.error("OpenRouter API Error:", data.error);
-      return "The AI service returned an error. Please check your API key.";
+      console.error("OpenRouter API Error Details:", JSON.stringify(data.error, null, 2));
+      return `AI Error: ${data.error.message || "Please check your API key and balance."}`;
     }
 
     return data.choices?.[0]?.message?.content || "No suggestions available at the moment.";

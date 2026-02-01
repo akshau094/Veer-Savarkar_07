@@ -90,5 +90,19 @@
         "python"
       ]
     }
+  },
+  {
+    "id": "1769941150950",
+    "name": "SAITWAL  AKSHAY  MADHUKAR",
+    "role": "vdfg",
+    "package": "12LPA",
+    "criteria": {
+      "minCgpa": 7,
+      "maxBacklogs": 0,
+      "allowedBranches": [],
+      "requiredSkills": [
+        "hello"
+      ]
+    }
   }
 ]

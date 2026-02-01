@@ -116,10 +116,11 @@
     "id": "s-1769939411305",
     "name": "Ak",
     "username": "ak",
-    "password": "Aexsaitwal094",
-    "cgpa": 0,
-    "branch": "Not Specified",
-    "backlogs": 0,
-    "skills": []
+    "cgpa": "8.7",
+    "branch": "CSE",
+    "backlogs": "0",
+    "skills": "python",
+    "year": "2",
+    "resumeName": "094 resume (2).pdf"
   }
 ]

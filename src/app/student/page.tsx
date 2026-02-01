@@ -27,8 +27,8 @@ export default function StudentLogin() {
         // Store student info in localStorage for session
         localStorage.setItem('studentProfile', JSON.stringify(data.student));
         
-        // If it's a new user (CGPA is 0), send to profile setup, else dashboard
-        if (data.student.cgpa === 0) {
+        // If it's a new user (CGPA is "0"), send to profile setup, else dashboard
+        if (data.student.cgpa === "0" || data.student.cgpa === 0) {
           router.push('/student/profile');
         } else {
           router.push('/student/dashboard');

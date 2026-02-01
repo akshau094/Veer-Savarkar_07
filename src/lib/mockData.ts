@@ -53,10 +53,14 @@ export const mockDrives: CompanyDrive[] = [
 export interface Student {
   id: string;
   name: string;
+  username?: string;
+  password?: string;
   cgpa: number;
   branch: string;
   backlogs: number;
   skills: string[];
+  year?: string;
+  resumeName?: string;
 }
 
 export const mockStudents: Student[] = [

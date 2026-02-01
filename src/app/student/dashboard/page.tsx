@@ -33,7 +33,7 @@ export default function StudentDashboard() {
         try {
           const appRes = await fetch(`/api/applications?studentId=${currentProfile.id}`);
           const apps = await appRes.json();
-          setApplications(apps);
+          setApplications(Array.isArray(apps) ? apps : []);
         } catch (e) {
           console.error('Failed to load applications:', e);
         }
@@ -45,6 +45,11 @@ export default function StudentDashboard() {
 
   const checkEligibility = (drive: CompanyDrive): EligibilityResult => {
     if (!profile) return { isEligible: false, reasons: ['Profile not completed'] };
+
+    // Check if profile is complete (CGPA and Branch are mandatory for eligibility)
+    if (!profile.cgpa || profile.branch === 'Not Specified' || !profile.branch) {
+      return { isEligible: false, reasons: ['Please complete your profile (CGPA & Branch) to check eligibility'] };
+    }
 
     const reasons: string[] = [];
     let isEligible = true;

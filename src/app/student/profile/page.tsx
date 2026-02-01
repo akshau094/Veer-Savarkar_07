@@ -26,12 +26,12 @@ export default function StudentProfile() {
     setLoading(true);
     
     try {
-      // For a real hackathon, you'd upload the PDF to a server or base64 it.
-      // Here we'll simulate saving the filename for local persistence.
+      const savedProfile = localStorage.getItem('studentProfile');
+      const baseProfile = savedProfile ? JSON.parse(savedProfile) : {};
+
       const updatedProfile = {
+        ...baseProfile,
         ...formData,
-        id: 's1',
-        name: 'Akash Kumar',
         resumeName: 'resume.pdf'
       };
 
@@ -126,6 +126,17 @@ export default function StudentProfile() {
                     value={formData.backlogs}
                     onChange={handleChange}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+
+                <div className="sm:col-span-6">
+                  <label htmlFor="resume" className="block text-sm font-medium text-gray-700">Resume (PDF)</label>
+                  <input
+                    type="file"
+                    id="resume"
+                    name="resume"
+                    accept=".pdf"
+                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
                 </div>
 

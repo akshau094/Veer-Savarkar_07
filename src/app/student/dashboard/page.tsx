@@ -11,7 +11,7 @@ interface EligibilityResult {
 
 export default function StudentDashboard() {
   const [profile, setProfile] = useState<any>(null);
-  const [applications, setApplications] = useState<string[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [drives, setDrives] = useState<CompanyDrive[]>([]);
 
   useEffect(() => {
@@ -22,14 +22,6 @@ export default function StudentDashboard() {
       if (savedProfile) {
         currentProfile = JSON.parse(savedProfile);
         setProfile(currentProfile);
-      } else {
-        const res = await fetch('/api/students');
-        const students = await res.json();
-        currentProfile = students.find((s: any) => s.id === 's1');
-        if (currentProfile) {
-          setProfile(currentProfile);
-          localStorage.setItem('studentProfile', JSON.stringify(currentProfile));
-        }
       }
 
       // 2. Load Drives
@@ -41,7 +33,7 @@ export default function StudentDashboard() {
         try {
           const appRes = await fetch(`/api/applications?studentId=${currentProfile.id}`);
           const apps = await appRes.json();
-          setApplications(apps.map((a: any) => a.driveId));
+          setApplications(apps);
         } catch (e) {
           console.error('Failed to load applications:', e);
         }
@@ -131,55 +123,73 @@ export default function StudentDashboard() {
           <p className="text-gray-600">Welcome back, {profile.name} ({profile.branch})</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">Upcoming Placement Drives</h2>
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {drives.map(drive => {
             const { isEligible, reasons } = checkEligibility(drive);
-            const isApplied = applications.includes(drive.id);
-
+            const application = applications.find(app => app.driveId === drive.id);
+            const isApplied = !!application;
+            
             return (
-              <div key={drive.id} className="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
-                <div className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-xl font-bold text-blue-600">{drive.name}</h3>
-                      <p className="text-gray-600 font-medium">{drive.role}</p>
-                      <p className="text-sm text-gray-500 mt-1">Package: {drive.package}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${isEligible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {isEligible ? 'Eligible' : 'Not Eligible'}
-                      </span>
-                    </div>
+              <div key={drive.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{drive.name}</h3>
+                    <p className="text-sm text-gray-500">{drive.role}</p>
                   </div>
+                  <span className="bg-indigo-50 text-indigo-700 text-xs font-semibold px-2.5 py-0.5 rounded">
+                    {drive.package}
+                  </span>
+                </div>
 
-                  <div className="mt-4">
-                    <h4 className="text-sm font-semibold text-gray-700">Eligibility Details:</h4>
-                    <ul className="mt-2 space-y-1">
+                <div className="space-y-3 mb-6 flex-grow">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <span className="font-medium mr-2">Criteria:</span>
+                    {drive.criteria.minCgpa} CGPA, {drive.criteria.maxBacklogs} Backlogs
+                  </div>
+                  
+                  {/* Explainability Section */}
+                  <div className="mt-4 p-3 rounded-lg bg-gray-50 border border-gray-100">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Eligibility Explanation</p>
+                    <ul className="space-y-1">
                       {reasons.map((reason, idx) => (
-                        <li key={idx} className={`text-sm ${reason.startsWith('Eligible') ? 'text-green-600' : 'text-red-600'}`}>
+                        <li key={idx} className={`text-[11px] leading-tight ${reason.startsWith('Eligible') ? 'text-green-600' : 'text-red-600'}`}>
                           • {reason}
                         </li>
                       ))}
                     </ul>
                   </div>
+                </div>
 
-                  <div className="mt-6 flex justify-end">
+                <div className="mt-auto pt-4 border-t border-gray-50">
+                  {isApplied ? (
+                    <div className="space-y-2">
+                      <button disabled className="w-full py-2 bg-gray-100 text-gray-400 rounded-lg font-medium cursor-not-allowed">
+                        Applied
+                      </button>
+                      <div className="flex items-center justify-center space-x-2">
+                        <span className="text-xs text-gray-500 italic">Current Status:</span>
+                        <span className={`text-xs font-bold uppercase ${
+                          application.status === 'Selected' ? 'text-green-600' : 
+                          application.status === 'Rejected' ? 'text-red-600' : 
+                          'text-blue-600'
+                        }`}>
+                          {application.status}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
                     <button
-                      disabled={!isEligible || isApplied}
                       onClick={() => handleApply(drive.id)}
-                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isApplied 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                          : isEligible 
-                            ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      disabled={!isEligible}
+                      className={`w-full py-2 rounded-lg font-medium transition-colors ${
+                        isEligible 
+                          ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                     >
-                      {isApplied ? 'Applied' : isEligible ? 'Apply Now' : 'Cannot Apply'}
+                      {isEligible ? 'Apply Now' : 'Not Eligible'}
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
             );

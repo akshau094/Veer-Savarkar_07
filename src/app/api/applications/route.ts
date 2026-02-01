@@ -56,3 +56,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to save application' }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, status } = await request.json();
+    const data = await fs.readFile(DATA_FILE, 'utf8');
+    const applications = JSON.parse(data);
+    
+    const index = applications.findIndex((app: any) => app.id === id);
+    if (index === -1) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+    }
+
+    applications[index].status = status;
+    applications[index].updatedAt = new Date().toISOString();
+    
+    await fs.writeFile(DATA_FILE, JSON.stringify(applications, null, 2));
+    
+    return NextResponse.json(applications[index]);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update application' }, { status: 500 });
+  }
+}

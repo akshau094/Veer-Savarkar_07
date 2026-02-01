@@ -19,28 +19,38 @@ export default function StudentProfile() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    const studentData = {
-      ...formData,
-      id: 's1', // For demo, we use a static ID or one from auth
-      name: 'Akash Kumar', // Mock name
-    };
-
     try {
-      await fetch('/api/students', {
+      // For a real hackathon, you'd upload the PDF to a server or base64 it.
+      // Here we'll simulate saving the filename for local persistence.
+      const updatedProfile = {
+        ...formData,
+        id: 's1',
+        name: 'Akash Kumar',
+        resumeName: 'resume.pdf'
+      };
+
+      const res = await fetch('/api/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(studentData),
+        body: JSON.stringify(updatedProfile),
       });
-      
-      // Still save to localStorage for quick dashboard access
-      localStorage.setItem('studentProfile', JSON.stringify(studentData));
-      router.push('/student/dashboard');
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      alert('Error saving profile to local system');
+
+      if (res.ok) {
+        localStorage.setItem('studentProfile', JSON.stringify(updatedProfile));
+        alert('Profile saved locally on system!');
+        router.push('/student/dashboard');
+      }
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+      alert('Failed to save profile');
+    } finally {
+      setLoading(false);
     }
   };
 

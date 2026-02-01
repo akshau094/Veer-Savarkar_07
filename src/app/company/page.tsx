@@ -61,6 +61,22 @@ export default function CompanyPortal() {
     return { isEligible, reasons };
   };
 
+  const handleUpdateStatus = async (appId: string, newStatus: string) => {
+    try {
+      const res = await fetch('/api/applications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: appId, status: newStatus }),
+      });
+      if (res.ok) {
+        const updatedApp = await res.json();
+        setApplications(prev => prev.map(app => app.id === appId ? updatedApp : app));
+      }
+    } catch (e) {
+      alert('Failed to update status locally');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -143,29 +159,44 @@ export default function CompanyPortal() {
                         );
                         
                         return (
-                          <tr key={student.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
+                          <tr key={student.id} className={!isEligible ? 'bg-gray-50 opacity-60' : ''}>
+                            <td className="px-6 py-4">
                               <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                              <div className="text-xs text-gray-500">{student.branch} | Year: {student.year || 'N/A'}</div>
                               {application && (
-                                <span className="text-[10px] bg-blue-100 text-blue-800 px-1 rounded">Applied</span>
+                                <span className="mt-1 inline-block text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold">
+                                  Status: {application.status}
+                                </span>
                               )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.cgpa}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                isEligible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                              }`}>
-                                {isEligible ? 'Eligible' : 'Ineligible'}
-                              </span>
+                            <td className="px-6 py-4">
+                              <div className="text-sm text-gray-900">CGPA: {student.cgpa}</div>
+                              <div className="text-xs text-gray-500">Backlogs: {student.backlogs}</div>
                             </td>
-                            <td className="px-6 py-4 text-xs text-gray-500">
-                              <ul className="list-disc pl-4">
-                                {reasons.map((r, i) => (
-                                  <li key={i} className={r.includes('>=') || r.includes('allowed') ? 'text-green-600' : 'text-red-600'}>
-                                    {r}
-                                  </li>
+                            <td className="px-6 py-4">
+                              <div className="max-w-xs">
+                                {reasons.map((reason, idx) => (
+                                  <div key={idx} className={`text-[11px] leading-tight mb-1 ${reason.startsWith('Eligible') ? 'text-green-600' : 'text-red-600'}`}>
+                                    • {reason}
+                                  </div>
                                 ))}
-                              </ul>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right text-sm font-medium">
+                              {application ? (
+                                <select 
+                                  value={application.status}
+                                  onChange={(e) => handleUpdateStatus(application.id, e.target.value)}
+                                  className="text-xs border rounded p-1"
+                                >
+                                  <option value="Applied">Applied</option>
+                                  <option value="Shortlisted">Shortlisted</option>
+                                  <option value="Selected">Selected</option>
+                                  <option value="Rejected">Rejected</option>
+                                </select>
+                              ) : (
+                                <span className="text-gray-400 text-xs italic">Not Applied</span>
+                              )}
                             </td>
                           </tr>
                         );

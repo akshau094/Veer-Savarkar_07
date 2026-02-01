@@ -145,10 +145,10 @@ export default function CompanyPortal() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Candidate</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eligibility</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reasoning</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Candidate Details</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Info</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eligibility (Explainability)</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Action / Status</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -175,8 +175,8 @@ export default function CompanyPortal() {
                             </td>
                             <td className="px-6 py-4">
                               <div className="max-w-xs">
-                                {reasons.map((reason, idx) => (
-                                  <div key={idx} className={`text-[11px] leading-tight mb-1 ${reason.startsWith('Eligible') ? 'text-green-600' : 'text-red-600'}`}>
+                                {reasons && reasons.map((reason, idx) => (
+                                  <div key={idx} className={`text-[11px] leading-tight mb-1 ${reason.includes('Eligible') && !reason.includes('Not') ? 'text-green-600' : 'text-red-600'}`}>
                                     • {reason}
                                   </div>
                                 ))}

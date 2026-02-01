@@ -123,7 +123,10 @@ export default function StudentDashboard() {
           <p className="text-gray-600">Welcome back, {profile.name} ({profile.branch})</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-gray-900">Upcoming Placement Drives</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {drives.map(drive => {
             const { isEligible, reasons } = checkEligibility(drive);
             const application = applications.find(app => app.driveId === drive.id);

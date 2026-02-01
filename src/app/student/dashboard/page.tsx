@@ -17,15 +17,17 @@ export default function StudentDashboard() {
   const [loadingAI, setLoadingAI] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const toggleSpeech = () => {
+  const toggleSpeech = (textToSpeak?: string) => {
     if (typeof window === 'undefined') return;
 
     if (isSpeaking) {
       window.speechSynthesis.cancel();
       setIsSpeaking(false);
     } else {
-      if (!aiSuggestions) return;
-      const utterance = new SpeechSynthesisUtterance(aiSuggestions);
+      const targetText = textToSpeak || aiSuggestions;
+      if (!targetText) return;
+      
+      const utterance = new SpeechSynthesisUtterance(targetText);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
       setIsSpeaking(true);
@@ -37,6 +39,13 @@ export default function StudentDashboard() {
     if (loadingAI) return;
     setLoadingAI(true);
     setAiSuggestions('');
+    
+    // Stop any current speech when fetching new suggestions
+    if (typeof window !== 'undefined' && isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+
     try {
       const res = await fetch('/api/ai-suggestions', {
         method: 'POST',
@@ -44,7 +53,13 @@ export default function StudentDashboard() {
         body: JSON.stringify({ studentProfile: currentProfile }),
       });
       const data = await res.json();
-      setAiSuggestions(data.suggestions || 'No suggestions available.');
+      const suggestions = data.suggestions || 'No suggestions available.';
+      setAiSuggestions(suggestions);
+      
+      // Automatically speak the response once generated
+      if (suggestions && suggestions !== 'No suggestions available.') {
+        toggleSpeech(suggestions);
+      }
     } catch (e) {
       console.error('AI Suggestion Error:', e);
     } finally {

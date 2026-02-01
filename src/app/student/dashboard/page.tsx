@@ -203,6 +203,7 @@ export default function StudentDashboard() {
               </div>
             );
           })}
+          </div>
         </div>
       </main>
     </div>

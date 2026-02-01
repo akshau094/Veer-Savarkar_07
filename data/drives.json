@@ -72,5 +72,23 @@
         "python"
       ]
     }
+  },
+  {
+    "id": "1769938415491",
+    "name": "google ",
+    "role": "web",
+    "package": "12LPA",
+    "criteria": {
+      "minCgpa": 7,
+      "maxBacklogs": 0,
+      "allowedBranches": [
+        "MECH",
+        "CIVIL",
+        "IT"
+      ],
+      "requiredSkills": [
+        "python"
+      ]
+    }
   }
 ]

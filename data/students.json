@@ -62,11 +62,12 @@
     "id": "s-1769936807560",
     "name": "Akshaysaitwal9@gmail.com",
     "username": "akshaysaitwal9@gmail.com",
-    "password": "akshaysaitwal@ms",
-    "cgpa": 0,
-    "branch": "Not Specified",
-    "backlogs": 0,
-    "skills": []
+    "cgpa": "6",
+    "branch": "CSE",
+    "backlogs": "0",
+    "skills": "pythomn",
+    "year": "2",
+    "resumeName": "resume.pdf"
   },
   {
     "id": "s-1769936931929",

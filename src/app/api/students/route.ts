@@ -6,6 +6,11 @@ const DATA_FILE = path.join(process.cwd(), 'data', 'students.json');
 
 export async function GET() {
   try {
+    try {
+      await fs.access(DATA_FILE);
+    } catch {
+      return NextResponse.json([]);
+    }
     const data = await fs.readFile(DATA_FILE, 'utf8');
     return NextResponse.json(JSON.parse(data));
   } catch (error) {

@@ -10,6 +10,12 @@ export async function GET(request: Request) {
     const studentId = searchParams.get('studentId');
     const driveId = searchParams.get('driveId');
 
+    try {
+      await fs.access(DATA_FILE);
+    } catch {
+      return NextResponse.json([]);
+    }
+
     const data = await fs.readFile(DATA_FILE, 'utf8');
     let applications = JSON.parse(data);
 

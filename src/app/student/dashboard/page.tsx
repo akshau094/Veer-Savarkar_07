@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import { getDrives, CompanyDrive } from '@/lib/mockData';
+import { CompanyDrive } from '@/lib/mockData';
 
 interface EligibilityResult {
   isEligible: boolean;
@@ -79,8 +79,13 @@ export default function StudentDashboard() {
       }
 
       // 2. Load Drives
-      const allDrives = await getDrives();
-      setDrives(allDrives);
+      try {
+        const driveRes = await fetch('/api/drives');
+        const allDrives = await driveRes.json();
+        setDrives(allDrives);
+      } catch (e) {
+        console.error('Failed to load drives:', e);
+      }
 
       // 3. Load Applications from local system
       if (currentProfile) {
